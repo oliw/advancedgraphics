@@ -1,0 +1,7 @@
+To compile
+g++ -o graphics loadPNM.cpp main.cpp + (any other .cpp's you use)
+
+To run
+./graphics
+
+
