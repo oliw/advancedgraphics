@@ -5,7 +5,9 @@ Year: 2013
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <assert.h>
 #include "loadPNM.h"
+#include "assembleHDR.h"
 
 //#define PI 3.14159265358979323
 #define uint unsigned int
@@ -154,9 +156,27 @@ void LoadPFMAndSavePPM(const char *image_in, const char *image_out)
 		}
 	}
 
-
 	WritePNM(image_out, width, height, numComponents, img_out);
 
+}
+
+void AssembleHDRImage(char** inputs, int numInputs,char* output) {
+    unsigned int height;
+    unsigned int width;
+    unsigned int components;
+    unsigned int numImages = numInputs;
+    cout<<"Loading Images"<<endl;
+    float** images = new float* [numImages];
+    for (int i = 0; i < numImages; i++) {
+      images[i] = loadPFM(inputs[i], width, height,components);
+    }
+	  float *outputData = new float [width*height*numComponents];
+    cout<<"Assembling HDR"<<endl;
+    assembleHDR(width, height, components, numImages, images, outputData);
+    cout<<"Write PFM"<<endl;
+    WritePFM(output,width,height,components,outputData);
+    cout<<"Reading PFM and saving as PPM"<<endl;
+    LoadPFMAndSavePPM(output, output);
 }
 
 int main(int argc, char** argv)
@@ -167,27 +187,13 @@ int main(int argc, char** argv)
   cerr<<"main invoked: arguments - <image_in (.ppm)> <image_out (.ppm)> "<<endl;
   
   int count = argc;
-
-  if(count < 2)
-  {
-    cout<<"Too few arguments! .... exiting."<<endl;
-    return 0;
-  }        
-
-  if(count == 2)
-  {  
-    CreateAndSavePFM(argv[1]); //Creates and saves a PFM
-  }
-  else
-  if(count == 3)
-  {  
-//  LoadAndSavePPM(argv[1], argv[2]); //Loads and saves a PPM file
-//  LoadAndSavePFM(argv[1], argv[2]); //Loads and saves a PFM file
-//	LoadPPMAndSavePFM(argv[1], argv[2]); //Loads PPM and saves a PFM file
-    LoadPFMAndSavePPM(argv[1], argv[2]); //Loads PFM and saves a PPM file
-  }  
-  
+  int numInputs = count-2;
+  assert(numInputs > 0);
+  char ** inputs = &argv[1];
+  AssembleHDRImage(inputs, numInputs, argv[count-1]);
  
+  //           output = new unsigned char[width*height];
+
   return 0;
 }
 
