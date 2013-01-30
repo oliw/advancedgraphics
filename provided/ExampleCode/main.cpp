@@ -170,7 +170,7 @@ void AssembleHDRImage(char** inputs, int numInputs,char* output) {
     for (int i = 0; i < numImages; i++) {
       images[i] = loadPFM(inputs[i], width, height,components);
     }
-	  float *outputData = new float [width*height*numComponents];
+	  float *outputData = new float [width*height*components];
     cout<<"Assembling HDR"<<endl;
     assembleHDR(width, height, components, numImages, images, outputData);
     cout<<"Write PFM"<<endl;
