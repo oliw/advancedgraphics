@@ -2,6 +2,4 @@ To compile
 g++ -o graphics loadPNM.cpp main.cpp + (any other .cpp's you use)
 
 To run
-./graphics
-
-
+./graphics ../Memorial/memorial1.pfm ../Memorial/memorial2.pfm ../Memorial/memorial3.pfm ../Memorial/memorial4.pfm ../Memorial/memorial5.pfm ../Memorial/memorial6.pfm ../Memorial/memorial7.pfm ../Memorial/output.ppm
