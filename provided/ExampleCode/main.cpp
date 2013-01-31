@@ -165,9 +165,10 @@ void AssembleHDRImage(char** inputs, int numInputs,char* output) {
     unsigned int width;
     unsigned int components;
     unsigned int numImages = numInputs;
-    cout<<"Loading Images"<<endl;
+    cout <<"Loading "<< numImages << " Images"<<endl;
     float** images = new float* [numImages];
     for (int i = 0; i < numImages; i++) {
+      cout << "Loading " << inputs[i] << endl;
       images[i] = loadPFM(inputs[i], width, height,components);
     }
 	  float *outputData = new float [width*height*components];
