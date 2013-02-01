@@ -8,6 +8,7 @@ Year: 2013
 #include <assert.h>
 #include "loadPNM.h"
 #include "assembleHDR.h"
+#include "toneMapper.h"
 
 //#define PI 3.14159265358979323
 #define uint unsigned int
@@ -178,6 +179,11 @@ void AssembleHDRImage(char** inputs, int numInputs,char* output) {
     WritePFM(output,width,height,components,outputData);
     cout<<"Reading PFM and saving as PPM"<<endl;
     LoadPFMAndSavePPM(output, output);
+    
+    
+    unsigned int imageSize = width * height * components;
+    unsigned char* toneMappedImage = simpleToneMap(imageSize, outputData);
+    WritePNM("../Memorial/simpleToneMapper.pnm", width, height, components, toneMappedImage);
 }
 
 int main(int argc, char** argv)
