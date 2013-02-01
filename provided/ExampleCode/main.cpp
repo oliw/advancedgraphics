@@ -180,9 +180,10 @@ void AssembleHDRImage(char** inputs, int numInputs,char* output) {
     cout<<"Reading PFM and saving as PPM"<<endl;
     LoadPFMAndSavePPM(output, output);
     
-    
     unsigned int imageSize = width * height * components;
-    unsigned char* toneMappedImage = simpleToneMap(imageSize, outputData);
+    unsigned int stops = 8;
+    float* exposureAdjustedImage = adjustExposure(imageSize, outputData, stops);
+    unsigned char* toneMappedImage = simpleToneMap(imageSize, exposureAdjustedImage);
     WritePNM("../Memorial/simpleToneMapper.pnm", width, height, components, toneMappedImage);
 }
 
