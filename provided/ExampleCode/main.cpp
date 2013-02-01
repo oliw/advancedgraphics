@@ -181,9 +181,11 @@ void AssembleHDRImage(char** inputs, int numInputs,char* output) {
     LoadPFMAndSavePPM(output, output);
     
     unsigned int imageSize = width * height * components;
-    unsigned int stops = 8;
+    unsigned int stops = 6;
+    float gamma = 2.2;
     float* exposureAdjustedImage = adjustExposure(imageSize, outputData, stops);
-    unsigned char* toneMappedImage = simpleToneMap(imageSize, exposureAdjustedImage);
+    float* gammaAdjustedImage = adjustGamma(imageSize, exposureAdjustedImage, gamma);
+    unsigned char* toneMappedImage = simpleToneMap(imageSize, gammaAdjustedImage);
     WritePNM("../Memorial/simpleToneMapper.pnm", width, height, components, toneMappedImage);
 }
 

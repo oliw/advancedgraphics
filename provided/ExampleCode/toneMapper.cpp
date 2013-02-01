@@ -29,3 +29,14 @@ float* adjustExposure(unsigned int &imageSize, float* input, unsigned int stops)
     }
     return output;
 }
+
+float* adjustGamma(unsigned int &imageSize, float* input, float gamma) {
+    float* output = new float[imageSize];
+    for (int pixel = 0; pixel < imageSize; pixel++) {
+        output[pixel] = pow(input[pixel], 1/gamma);
+        if (output[pixel] > 1.0) {
+          output[pixel] = 1.0;
+        }
+    }
+    return output;
+}
