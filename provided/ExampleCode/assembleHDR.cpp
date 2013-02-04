@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <iostream>
+#include <limits>
 
 using namespace std;
 
@@ -71,6 +72,31 @@ void calculateMinsAndMaxs(float** minValues,
   //cout << endl;
   }
 }    
+
+float calculateRange(float* image,
+                  unsigned int &width, 
+                  unsigned int &height,
+	                unsigned int &numComponents) {
+    float min = std::numeric_limits<float>::max();
+    float max = std::numeric_limits<float>::min();
+    for (int w = 0; w < width; w++) {
+      for (int h = 0; h < height; h++) {
+        int curr = h*width + w;
+        float pixelValue = 0;
+        for (int i = 0; i < numComponents; i++) {
+          pixelValue += image[curr+i];
+        }    
+        pixelValue /= numComponents;
+        if (pixelValue > max) {
+          max = pixelValue;
+        }
+        if (pixelValue < min) {
+          min = pixelValue;
+        }
+      }
+    }
+    return max / min;
+}
 
 void assembleHDR(unsigned int& width, 
                   unsigned int &height,

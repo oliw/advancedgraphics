@@ -8,4 +8,9 @@ void assembleHDR(unsigned int& width,
                   float** images,
                   float* output);
 
+float calculateRange(float* image,
+                  unsigned int& width, 
+                  unsigned int &height,
+	                unsigned int &numComponents);
+
 #endif

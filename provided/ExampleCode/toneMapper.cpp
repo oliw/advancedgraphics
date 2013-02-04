@@ -9,14 +9,21 @@ float brightestPixel(unsigned int &imageSize, float* image) {
     }
     return max;
 }
- 
-unsigned char* simpleToneMap(unsigned int &imageSize, float* input) {
+
+unsigned char* toPixelValues(unsigned int &imageSize, float* input) {
     unsigned char* output = new unsigned char[imageSize];
-    float max = brightestPixel(imageSize, input);
     for (int pixel = 0; pixel < imageSize; pixel++) {
-        output[pixel] = (input[pixel] / max) * 255;
+        output[pixel] = input[pixel] * 255;
     }
     return output;
+}
+ 
+float* simpleToneMap(unsigned int &imageSize, float* input) {
+    float max = brightestPixel(imageSize, input);
+    for (int pixel = 0; pixel < imageSize; pixel++) {
+        input[pixel] = input[pixel] / max;
+    }
+    return input;
 }
 
 float* adjustExposure(unsigned int &imageSize, float* input, unsigned int stops) {

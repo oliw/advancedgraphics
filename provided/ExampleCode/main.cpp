@@ -161,7 +161,7 @@ void LoadPFMAndSavePPM(const char *image_in, const char *image_out)
 
 }
 
-void AssembleHDRImage(char** inputs, int numInputs,char* output) {
+void AssembleHDRImage(char** inputs, int numInputs) {
     unsigned int height;
     unsigned int width;
     unsigned int components;
@@ -172,21 +172,25 @@ void AssembleHDRImage(char** inputs, int numInputs,char* output) {
       cout << "Loading " << inputs[i] << endl;
       images[i] = loadPFM(inputs[i], width, height,components);
     }
+    unsigned int imageSize = width * height * components;
 	  float *outputData = new float [width*height*components];
     cout<<"Assembling HDR"<<endl;
     assembleHDR(width, height, components, numImages, images, outputData);
-    cout<<"Write PFM"<<endl;
-    WritePFM(output,width,height,components,outputData);
-    cout<<"Reading PFM and saving as PPM"<<endl;
-    LoadPFMAndSavePPM(output, output);
-    
-    unsigned int imageSize = width * height * components;
+    cout<<"Write HDR image to PFM"<<endl;
+    WritePFM("HDR.pfm",width,height,components,outputData);
+    float range = calculateRange(outputData,width,height,components);
+    cout <<"Range is 1:"<<range<<endl;
+    cout<<"Apply Simple Tone Mapper"<<endl;
+    float* toneMapped = simpleToneMap(imageSize, outputData);
+    WritePNM("toneMapped.ppm",width,height, components, toPixelValues(imageSize, toneMapped));
     unsigned int stops = 6;
-    float gamma = 2.2;
+    cout<<"Apply Exposure Function with "<< stops <<" stops"<<endl;
     float* exposureAdjustedImage = adjustExposure(imageSize, outputData, stops);
+    WritePNM("exposure.ppm",width,height, components, toPixelValues(imageSize, exposureAdjustedImage));
+    float gamma = 2.2;
+    cout << "Apply Gamma Function with gamma value:" << gamma  << endl;
     float* gammaAdjustedImage = adjustGamma(imageSize, exposureAdjustedImage, gamma);
-    unsigned char* toneMappedImage = simpleToneMap(imageSize, gammaAdjustedImage);
-    WritePNM("../Memorial/simpleToneMapper.pnm", width, height, components, toneMappedImage);
+    WritePNM("gamma.ppm", width, height, components, toPixelValues(imageSize, gammaAdjustedImage));
 }
 
 int main(int argc, char** argv)
@@ -197,12 +201,10 @@ int main(int argc, char** argv)
   cerr<<"main invoked: arguments - <image_in (.ppm)> <image_out (.ppm)> "<<endl;
   
   int count = argc;
-  int numInputs = count-2;
+  int numInputs = count-1;
   assert(numInputs > 0);
   char ** inputs = &argv[1];
-  AssembleHDRImage(inputs, numInputs, argv[count-1]);
- 
-  //           output = new unsigned char[width*height];
+  AssembleHDRImage(inputs, numInputs);
 
   return 0;
 }
