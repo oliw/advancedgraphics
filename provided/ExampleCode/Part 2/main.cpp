@@ -163,22 +163,25 @@ void LoadPFMAndSavePPM(const char *image_in, const char *image_out)
 
 int main(int argc, char** argv)
 {
-
-          
-  cerr<<"main invoked: arguments - <image_out (.pfm)> "<<endl;
-  cerr<<"main invoked: arguments - <image_in (.ppm)> <image_out (.ppm)> "<<endl;
-    unsigned int width = 511;
+  assert (argc == 2);
+  const char* image_in = argv[1];
+  unsigned int texWidth,texHeight,texComp;
+  float *texMap = loadPFM(image_in,texWidth,texHeight,texComp);
+  unsigned int width = 511;
   unsigned int height = 511;
   unsigned int components = 3;
   // Create basic image
   cout << "Creating basic image" << endl;
   float* rVectorsPFM = new float [width*height*components];
   unsigned char* rVectorsPPM = new unsigned char [width*height*components];
-  createImage(rVectorsPFM,rVectorsPPM);
+  float* mappedPFM = new float [width*height*components];
+  unsigned char* mappedPPM = new unsigned char [width*height*components];
+  createImage(rVectorsPFM,rVectorsPPM,mappedPFM,mappedPPM,texMap);
   // Save basic image
   cout << "Writing image" << endl;
   WritePNM("rVectors.ppm",width,height,components, rVectorsPPM);
   WritePFM("rVectors.pfm",width,height,components, rVectorsPFM);
+  WritePNM("texturedSphere.ppm",width,height,components, mappedPPM);
   return 0;
 }
 
