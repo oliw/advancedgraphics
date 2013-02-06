@@ -9,14 +9,20 @@
 using namespace std;
 
 void normalise(float& x, float& y, float& z) {
-    float n = sqrt(x*x+y*y+z*z);
-    x /= n;
-    y /= n;
-    z /= n;
+  float n = sqrt(x*x+y*y+z*z);
+  x /= n;
+  y /= n;
+  z /= n;
 }
 
 int toArrIndex(float x, float y) {
   return (int)((y+255)*511*3+(x+255)*3);
+}
+
+// Geometric coordinates should be normalised
+void geometricToPolar(float& x, float& y, float& z, float& inclination, float& azimuth) {
+  inclination = acos(z);
+  azimuth = atan2(y, x);
 }
 
 void createImage(float* rVectorsPFM, unsigned char* rVectorsPPM, float* mappedPFM, unsigned char* mappedPPM, float* texture) {
@@ -34,13 +40,10 @@ void createImage(float* rVectorsPFM, unsigned char* rVectorsPPM, float* mappedPF
         float sy = y;
         float sz = z;
         normalise(sx,sy,sz);
-        // calculate polar coords
-        float inclination = acos(z/r);
-        float azimuth = atan2(y,x);  
         // calculate v
         float vx = -x;
         float vy = -y;
-        float vz = -z + 255;
+        float vz = -z + 1E+15;
         normalise(vx,vy,vz);
         // calculate n dot v
         float dot = sx*vx + sy*vy + sz*vz;
@@ -58,8 +61,11 @@ void createImage(float* rVectorsPFM, unsigned char* rVectorsPPM, float* mappedPF
         rVectorsPPM[toArrIndex(x,y) + 1] = ((ry+1)/2)*255;
         rVectorsPPM[toArrIndex(x,y) + 2] = ((rz+1)/2)*255;
         // shade using texture
-        int texX = floor((((azimuth+PI)/(2*PI))*512)+0.5);
-        int texY = floor((((inclination+(PI/2))/PI)*512)+0.5);
+        float rInclination = 0;
+        float rAzimuth = 0;
+        geometricToPolar(rx, ry, rz, rInclination, rAzimuth);
+        int texX = floor(((rAzimuth/(2*PI))*1024)+0.5);
+        int texY = floor(((rInclination/PI)*512)+0.5);
         for (int i = 0; i < components; i++) {
           float textureValue = min(1.0f, texture[texY*1024*3+texX*3+i]);
           //TODO PFM
