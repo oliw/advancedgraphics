@@ -20,9 +20,10 @@ int toArrIndex(float x, float y) {
 }
 
 // Geometric coordinates should be normalised
-void geometricToPolar(float& x, float& y, float& z, float& inclination, float& azimuth) {
-  inclination = acos(z);
-  azimuth = atan2(y, x);
+void geometricToPolar(float& x, float& y, float& z, float& inclination, float& azimuth) {  
+  float PI = atan(1.0f) * 4.0f;  
+  inclination = PI - acos(y); // range 0 -> PI
+  azimuth = atan2(x, z); // range -PI -> PI
 }
 
 void createImage(float* rVectorsPFM, unsigned char* rVectorsPPM, float* mappedPFM, unsigned char* mappedPPM, float* texture) {
@@ -41,11 +42,11 @@ void createImage(float* rVectorsPFM, unsigned char* rVectorsPPM, float* mappedPF
         float sz = z;
         normalise(sx,sy,sz);
         // calculate v
-        float vx = -x;
-        float vy = -y;
-        float vz = -z + 1E+15;
+        float vx = 0;
+        float vy = 0;
+        float vz = 1;
         normalise(vx,vy,vz);
-        // calculate n dot v
+        // calculate s dot v
         float dot = sx*vx + sy*vy + sz*vz;
         // calculate r
         float rx = 2*dot*sx-vx;
@@ -64,12 +65,14 @@ void createImage(float* rVectorsPFM, unsigned char* rVectorsPPM, float* mappedPF
         float rInclination = 0;
         float rAzimuth = 0;
         geometricToPolar(rx, ry, rz, rInclination, rAzimuth);
-        int texX = floor(((rAzimuth/(2*PI))*1024)+0.5);
+        assert(rInclination >= 0);
+        int texX = floor((((rAzimuth+PI)/(2*PI))*1024)+0.5);
         int texY = floor(((rInclination/PI)*512)+0.5);
         for (int i = 0; i < components; i++) {
           float textureValue = min(1.0f, texture[texY*1024*3+texX*3+i]);
           //TODO PFM
-          mappedPPM[(int)((y+255)*width*components+(x+255)*components)+i] = textureValue * 255;
+          mappedPFM[(int)((y+255)*width*components+(x+255)*components)+i] = texture[texY*1024*3+texX*3+i];
+          mappedPPM[(int)((y+255)*width*components+(x+255)*components)+i] = floor(textureValue * 255);
         }
       } else {
         // Not circle

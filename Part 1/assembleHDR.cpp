@@ -104,7 +104,6 @@ void assembleHDR(unsigned int& width,
                   unsigned int &numImages, 
                   float** images,
                   float* output) {
-
     assert(numImages == 7);
     // Compute the relative exposure length for each image
     float* ei = calculateEi();

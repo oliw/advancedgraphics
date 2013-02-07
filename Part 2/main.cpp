@@ -8,6 +8,7 @@ Year: 2013
 #include <assert.h>
 #include "loadPNM.h"
 #include "ibLighting.h"
+#include "toneMapper.h"
 
 //#define PI 3.14159265358979323
 #define uint unsigned int
@@ -177,11 +178,16 @@ int main(int argc, char** argv)
   float* mappedPFM = new float [width*height*components];
   unsigned char* mappedPPM = new unsigned char [width*height*components];
   createImage(rVectorsPFM,rVectorsPPM,mappedPFM,mappedPPM,texMap);
+  unsigned int imageSize = width*height*components;
+  float gamma = 2.2;
+  float* gammaAdjustedImage = adjustGamma(imageSize, mappedPFM, gamma);
   // Save basic image
   cout << "Writing image" << endl;
   WritePNM("rVectors.ppm",width,height,components, rVectorsPPM);
   WritePFM("rVectors.pfm",width,height,components, rVectorsPFM);
-  WritePNM("texturedSphere.ppm",width,height,components, mappedPPM);
+  //WritePNM("texturedSphere.ppm",width,height,components, mappedPPM);
+  WritePNM("gamma.ppm", width, height, components, toPixelValues(imageSize, gammaAdjustedImage));
+  WritePFM("image.pfm", width, height, components, mappedPFM);
   return 0;
 }
 

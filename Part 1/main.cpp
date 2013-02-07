@@ -184,13 +184,18 @@ void AssembleHDRImage(char** inputs, int numInputs) {
     float* toneMapped = simpleToneMap(imageSize, outputData);
     WritePNM("toneMapped.ppm",width,height, components, toPixelValues(imageSize, toneMapped));
     unsigned int stops = 6;
-    cout<<"Apply Exposure Function with "<< stops <<" stops"<<endl;
     float* exposureAdjustedImage = adjustExposure(imageSize, outputData, stops);
     WritePNM("exposure.ppm",width,height, components, toPixelValues(imageSize, exposureAdjustedImage));
     float gamma = 2.2;
     cout << "Apply Gamma Function with gamma value:" << gamma  << endl;
     float* gammaAdjustedImage = adjustGamma(imageSize, exposureAdjustedImage, gamma);
     WritePNM("gamma.ppm", width, height, components, toPixelValues(imageSize, gammaAdjustedImage));
+
+    stops = 8.8;
+    cout<<"Apply Exposure Function with "<< stops <<" stops"<<endl;
+    float* soloexposureAdjustedImage = adjustExposure(imageSize, outputData, stops);
+    WritePNM("exposure.ppm",width,height, components, toPixelValues(imageSize, soloexposureAdjustedImage));
+    
 }
 
 int main(int argc, char** argv)
