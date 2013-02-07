@@ -81,7 +81,7 @@ float calculateRange(float* image,
     float max = std::numeric_limits<float>::min();
     for (int w = 0; w < width; w++) {
       for (int h = 0; h < height; h++) {
-        int curr = h*width + w;
+        int curr = h*width*numComponents + w*numComponents;
         float pixelValue = 0;
         for (int i = 0; i < numComponents; i++) {
           pixelValue += image[curr+i];
