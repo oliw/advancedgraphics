@@ -7,7 +7,6 @@
 using namespace std;
 
 float PI = atan(1.0f) * 4.0f;
-float emR = 1;
 
 void normalise(float& x, float& y, float& z) {
   float n = sqrt(x*x+y*y+z*z);
@@ -21,11 +20,11 @@ int toArrIndex(float x, float y) {
 }
 
 void environmentMapToGeometric(int texX, int texY, float& x, float& y, float& z) {
-  float azimuth = (texX / 1024.0) * 2 * PI;
-  float inclination = (texY / 512.0) * PI;
-  x = emR * sin(inclination) * sin(azimuth);
-  y = emR * cos(inclination);
-  z = emR * sin(inclination) * cos(azimuth);
+  float azimuth = ((texX / 1024.0) * 2 * PI) - PI;
+  float inclination = ((texY / 512.0) * PI) - PI;
+  x = sin(inclination) * sin(-azimuth);
+  y = cos(inclination);
+  z = sin(inclination) * cos(-azimuth);
 }
 
 void renderPixel(float* rendering, float* sampleMap, int samples, int x, int y) {
@@ -35,11 +34,6 @@ void renderPixel(float* rendering, float* sampleMap, int samples, int x, int y) 
   float ny = y;
   float nz = z;
   normalise(nx, ny, nz);
-  // calculate reflected
-  float rx = nx - 0;
-  float ry = ny - 0;
-  float rz = nz - 1;
-  normalise(rx, ry, rz);
   // calculate pixel value
   float incidentSum = 0;
   float redAngleSum = 0;
@@ -69,9 +63,9 @@ void renderPixel(float* rendering, float* sampleMap, int samples, int x, int y) 
   }
   incidentSum /= samples;
   int index = toArrIndex(x, y);
-  rendering[index + 0] = redAngleSum;
-  rendering[index + 1] = greenAngleSum;
-  rendering[index + 2] = blueAngleSum;
+  rendering[index + 0] = incidentSum * redAngleSum;
+  rendering[index + 1] = incidentSum * greenAngleSum;
+  rendering[index + 2] = incidentSum * blueAngleSum;
 }
 
 void render(float* rendering, float* sampleMap, int samples) {
