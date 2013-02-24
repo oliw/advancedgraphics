@@ -7,7 +7,7 @@
 using namespace std;
 
 float PI = atan(1.0f) * 4.0f;
-int emR = 1000;
+float emR = 100;
 
 void normalise(float& x, float& y, float& z) {
   float n = sqrt(x*x+y*y+z*z);
@@ -20,12 +20,12 @@ int toArrIndex(float x, float y) {
   return (int)((y + 255) * 511 * 3 + (x + 255) * 3);
 }
 
-void environmentMapToGeometric(int texX, int texY, float x, float y, float z) {
-  float azimuth = ((texX / 1024) * 2 * PI) - PI;
-  float inclination = (texY / 512) * PI;
-  x = emR * sin(inclination - PI) * sin(azimuth);
-  z = emR * sin(inclination - PI) * cos(azimuth);
-  y = emR * cos(inclination - PI);
+void environmentMapToGeometric(int texX, int texY, float& x, float& y, float& z) {
+  float azimuth = (texX / 1024.0) * 2 * PI;
+  float inclination = (texY / 512.0) * PI;
+  x = emR * sin(inclination) * sin(azimuth);
+  y = emR * cos(inclination);
+  z = emR * sin(inclination) * cos(azimuth);
 }
 
 void renderPixel(float* rendering, float* sampleMap, int samples, int x, int y) {
@@ -62,7 +62,6 @@ void renderPixel(float* rendering, float* sampleMap, int samples, int x, int y) 
     // Cosine of angle between normal and incident
     float cosine = (ix * nx + iy * ny + iz * nz) / emR;
     float n = sqrt(r*r + g*g + b*b);
-    cout << cosine << endl;
     float commonAngleSum = (1 / PI) * cosine;
     redAngleSum += commonAngleSum * r/n;
     greenAngleSum += commonAngleSum * g/n;
@@ -73,7 +72,6 @@ void renderPixel(float* rendering, float* sampleMap, int samples, int x, int y) 
   rendering[index + 0] = incidentSum * redAngleSum;
   rendering[index + 1] = incidentSum * greenAngleSum;
   rendering[index + 2] = incidentSum * blueAngleSum;
-  cout << incidentSum << redAngleSum << rendering[index + 2] << endl;
 }
 
 void render(float* rendering, float* sampleMap, int samples) {

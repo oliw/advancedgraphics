@@ -185,7 +185,7 @@ int main(int argc, char** argv) {
     WritePFM(s2.str().c_str(), renderSize, renderSize, channels, renderingPFM);
     // Write PPM
     renderingPFM = simpleToneMap(imageSize, renderingPFM);
-    renderingPFM = adjustExposure(imageSize, renderingPFM, 8);
+    //renderingPFM = adjustExposure(imageSize, renderingPFM, 2);
     renderingPFM = adjustGamma(imageSize, renderingPFM, 2.2);  
     unsigned char *renderingPPM = toPixelValues(imageSize, renderingPFM);
     stringstream s1;
