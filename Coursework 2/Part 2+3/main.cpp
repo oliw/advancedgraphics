@@ -169,21 +169,31 @@ int main(int argc, char** argv) {
   unsigned int channels = 3;
   unsigned int imageSize = width * height * channels;
   float* environmentMap = loadPFM("GraceCathedral/grace_latlong.pfm", width, height, channels);
+  int samples [3] = {64, 256, 1024};
   // Part 2
-  float* sampleMapPFM = loadPFM("GraceCathedral/grace_latlong.pfm", width, height, channels);
-  sampleEnvironmentMap(environmentMap, sampleMapPFM, 512);
-  sampleMapPFM = simpleToneMap(imageSize, sampleMapPFM);
-  sampleMapPFM = adjustExposure(imageSize, sampleMapPFM, 8);
-  sampleMapPFM = adjustGamma(imageSize, sampleMapPFM, 2.2);
-  unsigned char *sampleMapPPM = toPixelValues(imageSize, sampleMapPFM);
-  WritePNM("samples.ppm", width, height, channels, sampleMapPPM);
+  for (int s = 0; s < 3; s++) {
+    int sampleSize = samples[s];
+    float* sampleMapPFM = loadPFM("GraceCathedral/grace_latlong.pfm", width, height, channels);
+    sampleEnvironmentMap(environmentMap, sampleMapPFM, sampleSize);
+    // Write PFM
+    stringstream s1;
+    s1 << "samples_em_" << sampleSize << ".pfm";
+    WritePFM(s1.str().c_str(), width, height, channels, sampleMapPFM);    
+    // Write PPM
+    sampleMapPFM = simpleToneMap(imageSize, sampleMapPFM);
+    sampleMapPFM = adjustExposure(imageSize, sampleMapPFM, 8);
+    sampleMapPFM = adjustGamma(imageSize, sampleMapPFM, 2.2);
+    unsigned char *sampleMapPPM = toPixelValues(imageSize, sampleMapPFM);
+    stringstream s2;
+    s2 << "samples_em_" << sampleSize << ".ppm";
+    WritePNM(s2.str().c_str(), width, height, channels, sampleMapPPM);
+  }
   // Part 3
-  int samples [3] = {64,256,1024};
   int ns [4] = { 1, 10, 50, 200};
   for (int s = 0; s < 3; s++) {
     int sampleSize = samples[s];
     for (int i = 0; i < 4 ;i++) {
-      sampleMapPFM = loadPFM("GraceCathedral/grace_latlong.pfm", width, height, channels);
+      float* sampleMapPFM = loadPFM("GraceCathedral/grace_latlong.pfm", width, height, channels);
       int n = ns[i];
       samplePhongModel(sampleMapPFM, n, sampleSize);
       // Write PFM
@@ -194,7 +204,7 @@ int main(int argc, char** argv) {
       sampleMapPFM = simpleToneMap(imageSize, sampleMapPFM);
       sampleMapPFM = adjustExposure(imageSize, sampleMapPFM, 8);
       sampleMapPFM = adjustGamma(imageSize, sampleMapPFM, 2.2);  
-      sampleMapPPM = toPixelValues(imageSize, sampleMapPFM);
+      unsigned char *sampleMapPPM = toPixelValues(imageSize, sampleMapPFM);
       stringstream s;
       s << "samplesphong" << "ssize" << sampleSize << "n" << n << ".ppm";
       WritePNM(s.str().c_str(), width, height, channels, sampleMapPPM);

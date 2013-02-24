@@ -94,13 +94,9 @@ void sampleLine(float *intensityMap, float *sampledMap, int line, int samples) {
 
 void sampleEnvironmentMap(float *environmentMap, float *sampleMap, int samples) {
   float *intensityMap = calculateIntensityMap(environmentMap);
-  cout << "Intensity Map" << endl;
   float *lineIntensities = calculateLineIntensities(intensityMap);
-  cout << "Line intensities" << endl;
   float *cdf = calculateCDF(lineIntensities, 512);
-  cout << "Cdf" << endl;
   int *samplesPerLine = invertCDF(cdf, 512, samples);
-  cout << "Invert" << endl;
   for (int line = 0; line < 512; line++) {
     int lineSamples = samplesPerLine[line];
     if (lineSamples > 0) {
