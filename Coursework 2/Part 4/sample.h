@@ -3,4 +3,6 @@
 
 void sampleEnvironmentMap(float *environmentMap, float *sampleMap, int samples);
 
+float calculateAverageIntensity(float* environmentMap);
+
 #endif

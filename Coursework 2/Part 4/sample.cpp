@@ -25,6 +25,15 @@ float* calculateIntensityMap(float *environmentMap) {
   return intensityMap;
 }
 
+float calculateAverageIntensity(float* environmentMap) {
+  float* intensityMap = calculateIntensityMap(environmentMap);
+  float sum = 0;
+  for (int index = 0; index < 1024 * 512; index++) {
+    sum += intensityMap[index];
+  }
+  return sum / 1024 * 512;
+}
+
 float* calculateLineIntensities(float* intensityMap) {
   float* lineIntensities = new float[512];
   for (int y = 0; y < 512; y++) {

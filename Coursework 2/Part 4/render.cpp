@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include "sample.h"
 #include <assert.h>
 
 using namespace std;
@@ -27,7 +28,7 @@ void environmentMapToGeometric(int texX, int texY, float& x, float& y, float& z)
   z = sin(inclination) * cos(-azimuth);
 }
 
-void renderPixel(float* rendering, float* sampleMap, int samples, int x, int y) {
+void renderPixel(float* rendering, float* sampleMap, int samples, int x, int y, float averageIntensity) {
   float z = sqrt(255*255 - x*x - y*y);
   // calculate normal
   float nx = x;
@@ -61,18 +62,19 @@ void renderPixel(float* rendering, float* sampleMap, int samples, int x, int y) 
       blueAngleSum += commonAngleSum * b/n;
     }
   }
-  incidentSum /= samples;
+  averageIntensity /= samples;
   int index = toArrIndex(x, y);
-  rendering[index + 0] = incidentSum * redAngleSum;
-  rendering[index + 1] = incidentSum * greenAngleSum;
-  rendering[index + 2] = incidentSum * blueAngleSum;
+  rendering[index + 0] = averageIntensity * redAngleSum;
+  rendering[index + 1] = averageIntensity * greenAngleSum;
+  rendering[index + 2] = averageIntensity * blueAngleSum;
 }
 
-void render(float* rendering, float* sampleMap, int samples) {
+void render(float* rendering, float* sampleMap, float* environmentMap, int samples) {
+  float averageIntensity = calculateAverageIntensity(environmentMap);
   for (float x = -255; x < 255; x++) {
     for (float y = -255; y < 255; y++) {
       if (x * x + y * y <= 255 * 255) {
-        renderPixel(rendering, sampleMap, samples, x, y);
+        renderPixel(rendering, sampleMap, samples, x, y, averageIntensity);
       } else {
         rendering[toArrIndex(x, y) + 0] = 0;
         rendering[toArrIndex(x, y) + 1] = 0;

@@ -178,7 +178,7 @@ int main(int argc, char** argv) {
     float* sampleMap = new float[5 * (sampleSize + 1)];
     sampleEnvironmentMap(environmentMapPFM, sampleMap, sampleSize);
     float* renderingPFM = new float[renderSize * renderSize * channels];
-    render(renderingPFM, sampleMap, sampleSize);
+    render(renderingPFM, sampleMap, environmentMapPFM, sampleSize);
     // Write PFM
     stringstream s2;
     s2 << "rendering_" << sampleSize << ".pfm";
